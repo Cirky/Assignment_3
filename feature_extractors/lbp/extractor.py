@@ -7,7 +7,7 @@ class LBP:
 		self.num_points = num_points * radius
 		self.radius = radius
 		self.eps = eps
-		self.resize=resize
+		self.resize = resize
 
 	def extract(self, img):
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -17,8 +17,10 @@ class LBP:
 	
 		n_bins = int(lbp.max() + 1)
 		hist, _ = np.histogram(lbp, density=True, bins=n_bins, range=(0, n_bins))
-		
-		# TODO
+
+		# normalize the histogram
+		hist = hist.astype("float")
+		hist /= (hist.sum() + self.eps)
 		
 		return hist
 

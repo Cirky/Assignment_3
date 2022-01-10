@@ -33,8 +33,10 @@ class EvaluateAll:
         return d
 
     def run_evaluation(self):
-
-        im_list = sorted(glob.glob(self.images_path + '/*.png', recursive=True))
+        if self.images_path.find("perfectly"):
+            im_list = sorted(glob.glob(self.images_path + '/*.png', recursive=True))
+        else:
+            im_list = sorted(glob.glob(self.images_path + '/*.jpg', recursive=True))  # yolo nrdi jpg
         iou_arr = []
         preprocess = Preprocess()
         evaluation = Evaluation()
@@ -46,7 +48,11 @@ class EvaluateAll:
         # Pixel-wise comparison:
         import feature_extractors.pix2pix.extractor as p2p_ext
         pix2pix = p2p_ext.Pix2Pix()
-        
+
+        # LBP:
+        import feature_extractors.lbp.extractor as lbp_ext
+        lbp = lbp_ext.LBP()
+
         lbp_features_arr = []
         plain_features_arr = []
         y = []
@@ -59,22 +65,31 @@ class EvaluateAll:
             # print(cla_d)
             im_name = im_name.replace("\\", "/")
 
-            y.append(cla_d['/'.join(im_name.split('/')[-2:])])
+            key = '/'.join(im_name.split('/')[-2:])
+            # moj yolo zazna vec usec in annotationi niso pravilni
+            # ce ni not to pomeni da je oznaceno kot drugo uho in mu lahko damo class prvega usesa
+            if key not in cla_d:
+                prvo_uho = key[0: 9:] + key[9 + 1::]
+                # print(prvo_uho)
+                y.append(cla_d[prvo_uho])
+            else:
+                y.append(cla_d[key])
 
             # Apply some preprocessing here
-            
+
             # Run the feature extractors            
-            plain_features = pix2pix.extract(img)
-            plain_features_arr.append(plain_features)
+            # plain_features = pix2pix.extract(img)
+            # plain_features_arr.append(plain_features)
 
-            # lbp_features = lbp.extract(img)
-            # lbp_features_arr.append(lbp_features)
+            lbp_features = lbp.extract(img)
+            lbp_features_arr.append(lbp_features)
 
+        # Y_plain = cdist(plain_features_arr, plain_features_arr, 'jensenshannon')
+        Y_plain = cdist(lbp_features_arr, lbp_features_arr, 'jensenshannon')
 
-        Y_plain = cdist(plain_features_arr, plain_features_arr, 'jensenshannon')
-        
         r1 = evaluation.compute_rank1(Y_plain, y)
-        print('Pix2Pix Rank-1[%]', r1)
+        # r5 = evaluation.compute_rank5(Y_plain, y)
+        print('Rank-1[%]', r1)
 
 if __name__ == '__main__':
     ev = EvaluateAll()
