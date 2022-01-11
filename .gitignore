@@ -115,3 +115,5 @@ dmypy.json
 
 /data
 .idea
+/Ears
+best_resnet34.pth
