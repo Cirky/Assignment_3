@@ -119,3 +119,4 @@ dmypy.json
 /Ears_yolo
 best_resnet34_aug.pth
 best_resnet34_no_aug.pth
+best_resnet34_aug_yolo.pth
