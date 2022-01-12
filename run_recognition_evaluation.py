@@ -86,21 +86,21 @@ class EvaluateAll:
             # Apply some preprocessing here
 
             # Run the feature extractors            
-            # plain_features = pix2pix.extract(img)
-            # plain_features_arr.append(plain_features)
+            plain_features = pix2pix.extract(img)
+            plain_features_arr.append(plain_features)
 
-            lbp_features = lbp.extract(img)
-            lbp_features_arr.append(lbp_features)
+            # lbp_features = lbp.extract(img)
+            # lbp_features_arr.append(lbp_features)
 
-        # Y_plain = cdist(plain_features_arr, plain_features_arr, 'jensenshannon')
-        Y_plain = cdist(lbp_features_arr, lbp_features_arr, 'jensenshannon')
+        Y_plain = cdist(plain_features_arr, plain_features_arr, 'jensenshannon')
+        # Y_plain = cdist(lbp_features_arr, lbp_features_arr, 'jensenshannon')
 
-        # r1 = evaluation.compute_rank1(Y_plain, y)
-        # print('Rank-1[%]', r1)
+        r1 = evaluation.compute_rank1(Y_plain, y)
+        print('Rank-1[%]', r1)
         # r5 = evaluation.compute_rank_n(Y_plain, y, 5)
         # print('Rank-5[%]', r5)
 
-        evaluation.plot_CMC(Y_plain, y, "CMC plot for LBP with provided ears")
+        # evaluation.plot_CMC(Y_plain, y, "CMC plot for LBP with provided ears")
 
 
 if __name__ == '__main__':
