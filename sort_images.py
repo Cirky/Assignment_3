@@ -34,10 +34,14 @@ class SortImages:
         return d
 
     def sort_images(self):
-        if self.images_path.find("perfectly"):
+        if "perfectly" in self.images_path:
             im_list = sorted(glob.glob(self.images_path + '/*.png', recursive=True))
+            path_start = "Ears_provided/dataset/"
+            koncnica = ".png"
         else:
             im_list = sorted(glob.glob(self.images_path + '/*.jpg', recursive=True))  # yolo nrdi jpg
+            path_start = "Ears_yolo/dataset/"
+            koncnica = ".jpg"
 
         cla_d = self.get_annotations(self.annotations_path)
 
@@ -48,23 +52,29 @@ class SortImages:
             key = '/'.join(im_name.split('/')[-2:])
 
             if key not in cla_d:
-                prvo_uho = key[0: 9:] + key[9 + 1::]
+                if "train" in self.images_path:
+                    prvo_uho = key[0: 10:] + key[10 + 1::]
+                else:
+                    prvo_uho = key[0: 9:] + key[9 + 1::]
+                print(key)
+                print(prvo_uho)
                 ear_class = cla_d[prvo_uho]
             else:
                 ear_class = cla_d[key]
 
-            path = "Ears/dataset/" + str(ear_class)
+            path = path_start + str(ear_class) + "/"
 
             if not os.path.exists(path):
                 os.mkdir(path)
 
+            # print(path)
             img_name = key[5:]
             img_name = img_name[:-4]
-            if self.images_path.find("train"):
-                img_name = img_name + "tr.png"
+
+            if "train" in self.images_path:
+                img_name = img_name + "tr" + koncnica
             else:
-                img_name = img_name + ".png"
-            # print(img_name)
+                img_name = img_name + koncnica
             filename = path + img_name
             # print(filename)
             cv2.imwrite(filename, img)

@@ -33,10 +33,14 @@ class EvaluateAll:
         return d
 
     def run_evaluation(self):
-        if self.images_path.find("perfectly"):
+        if "perfectly" in self.images_path:
             im_list = sorted(glob.glob(self.images_path + '/*.png', recursive=True))
+            path_start = "Ears_provided/dataset/"
+            koncnica = ".png"
         else:
             im_list = sorted(glob.glob(self.images_path + '/*.jpg', recursive=True))  # yolo nrdi jpg
+            path_start = "Ears_yolo/dataset/"
+            koncnica = ".jpg"
         iou_arr = []
         preprocess = Preprocess()
         evaluation = Evaluation()
@@ -68,9 +72,13 @@ class EvaluateAll:
             key = '/'.join(im_name.split('/')[-2:])
             # moj yolo zazna vec usec in annotationi niso pravilni
             # ce ni not to pomeni da je oznaceno kot drugo uho in mu lahko damo class prvega usesa
+
             if key not in cla_d:
-                prvo_uho = key[0: 9:] + key[9 + 1::]
-                # print(prvo_uho)
+                if "train" in self.images_path:
+                    prvo_uho = key[0: 10:] + key[10 + 1::]
+                else:
+                    prvo_uho = key[0: 9:] + key[9 + 1::]
+
                 y.append(cla_d[prvo_uho])
             else:
                 y.append(cla_d[key])
@@ -87,9 +95,13 @@ class EvaluateAll:
         # Y_plain = cdist(plain_features_arr, plain_features_arr, 'jensenshannon')
         Y_plain = cdist(lbp_features_arr, lbp_features_arr, 'jensenshannon')
 
-        r1 = evaluation.compute_rank1(Y_plain, y)
-        # r5 = evaluation.compute_rank5(Y_plain, y)
-        print('Rank-1[%]', r1)
+        # r1 = evaluation.compute_rank1(Y_plain, y)
+        # print('Rank-1[%]', r1)
+        # r5 = evaluation.compute_rank_n(Y_plain, y, 5)
+        # print('Rank-5[%]', r5)
+
+        evaluation.plot_CMC(Y_plain, y, "CMC plot for LBP with provided ears")
+
 
 if __name__ == '__main__':
     ev = EvaluateAll()
